@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: auth_db
+    ports:
+      - "5435:5432"
+    volumes:
+      - ./migrations:/docker-entrypoint-initdb.d
+
+  auth-service:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      DATABASE_URL: postgres://user:password@db:5432/auth_db?sslmode=disable
+      JWT_SECRET: your_jwt_secret_key
+      SMTP_HOST: smtp.example.com
+      SMTP_PORT: 587
+      SMTP_USERNAME: your_smtp_username
+      SMTP_PASSWORD: your_smtp_password
+    depends_on:
+      - db
